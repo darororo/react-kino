@@ -15,6 +15,8 @@ const supabaseClient = createClient(
 export const updateSearchCount = async (query: string, movie: Movie) => {
 	try {
 
+		if (query.length === 0) return
+
 		const result = await supabaseClient
 			.from(MOVIE_DB.metrics)
 			.select()
@@ -36,7 +38,7 @@ export const updateSearchCount = async (query: string, movie: Movie) => {
 				.from(MOVIE_DB.metrics)
 				.insert(
 					{
-						searchTerm: query,
+						searchTerm: query.toLowerCase(),
 						movie_id: movie.id,
 						title: movie.title,
 						count: 1,
@@ -49,4 +51,23 @@ export const updateSearchCount = async (query: string, movie: Movie) => {
 		throw (error)
 	}
 
+}
+
+export const getTrendingMovies = async (): Promise<TrendingMovie[] | undefined> => {
+	try {
+
+		const result = await supabaseClient
+			.from(MOVIE_DB.metrics)
+			.select()
+			.order('count', { ascending: false })
+			.limit(5)
+
+
+		return result.data as unknown as TrendingMovie[]
+
+	} catch (error) {
+		console.log(error)
+
+		return undefined
+	}
 }
