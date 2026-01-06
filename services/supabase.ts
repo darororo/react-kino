@@ -16,11 +16,12 @@ export const updateSearchCount = async (query: string, movie: Movie) => {
 	try {
 
 		if (query.length === 0) return
+		const queryLower = query.toLowerCase()
 
 		const result = await supabaseClient
 			.from(MOVIE_DB.metrics)
 			.select()
-			.eq("searchTerm", query)
+			.eq("searchTerm", queryLower)
 
 		console.log(result)
 
@@ -38,11 +39,11 @@ export const updateSearchCount = async (query: string, movie: Movie) => {
 				.from(MOVIE_DB.metrics)
 				.insert(
 					{
-						searchTerm: query.toLowerCase(),
+						searchTerm: queryLower,
 						movie_id: movie.id,
 						title: movie.title,
 						count: 1,
-						poster_uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+						poster_url: `https://image.tmdb.org/t/p/w500${movie.poster_path}`
 					}
 				)
 		}
